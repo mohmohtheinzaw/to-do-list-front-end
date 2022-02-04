@@ -1,0 +1,105 @@
+<template>
+  <div id="app">
+    <!-- V-for -->
+    <div class="container">
+      <h3 class="header">To Do List</h3>
+      <div id="list">
+        <ul class="task-list">
+          <li v-for="(todo, index) in todos" :key="todo.title">
+            <div v-if="!todo.done" class="task undone">
+              <p class="title">{{ todo.title }}</p>
+              <p class="date">{{ new Date(todo.date).toLocaleString() }}</p>
+            </div>
+            <div v-else class="task done">
+              <p class="title">{{ todo.title }}</p>
+              <p class="date">{{ new Date(todo.date).toLocaleString() }}</p>
+            </div>
+            <button @click="changeStatus(index)">Change Status</button>
+          </li>
+        </ul>
+      </div>
+      <!-- Input -->
+      <input type="text" placeholder="Enter task title" v-model="textInput" />
+      <!-- Button -->
+      <button @click="addToList" id="btn">Add List</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getAllTasks, addTask } from "./api";
+export default {
+  name: "App",
+  data: function () {
+    return {
+      todos: [],
+      textInput: null,
+    };
+  },
+  methods: {
+    addToList: function () {
+      if (this.textInput) {
+        if (this.textInput.length > 5) {
+          let objToAdd = {
+            title: this.textInput,
+            done: false,
+          };
+          addTask(objToAdd);
+          // this.todos.push(objToAdd);
+          // this.textInput = "";
+        } else {
+          alert("name must be at least 5 character");
+        }
+      } else {
+        alert("Enter task");
+      }
+    },
+    changeStatus: function (index) {
+      this.todos[index].done = !this.todos[index].done;
+    },
+  },
+  created: async function () {
+    this.todos = await getAllTasks();
+  },
+};
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+.container {
+  max-width: 550px;
+  align-self: center;
+}
+#list {
+  border-radius: 5px;
+  margin-top: 100px;
+}
+#btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.task-list {
+  list-style-type: none;
+}
+.task > p {
+  display: inline;
+  margin: 0 30px;
+}
+.task {
+  border: 2px solid #3333;
+  padding: 15px 0;
+  border-radius: 20px;
+}
+.done {
+  opacity: 0.5;
+}
+.done > .title {
+  text-decoration: line-through;
+}
+</style>
