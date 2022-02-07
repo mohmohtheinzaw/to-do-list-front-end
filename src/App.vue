@@ -7,12 +7,12 @@
         <ul class="task-list">
           <li v-for="(todo, index) in todos" :key="todo.title" class="task">
             <div v-if="!todo.done" class="undone">
-              <p class="title">{{ index }}</p>
+              
               <p class="title">{{ todo.title }}</p>
               <p class="date">{{ new Date(todo.date).toLocaleString() }}</p>
             </div>
             <div v-else class="task done">
-              <p class="title">{{ index }}</p>
+              
               <p class="title">{{ todo.title }}</p>
               <p class="date">{{ new Date(todo.date).toLocaleString() }}</p>
             </div>
@@ -31,7 +31,13 @@
 </template>
 
 <script>
-import { getAllTasks, addTask, changeStatus, deleteStatus, updateTask} from "./api";
+import {
+  getAllTasks,
+  addTask,
+  changeStatus,
+  deleteStatus,
+  updateTask,
+} from "./api";
 export default {
   name: "App",
   data: function () {
@@ -67,12 +73,17 @@ export default {
       this.todos = await getAllTasks();
     },
     updateItem: async function (index) {
-      let newTitle = prompt("Enter new title");
-
-      console.log(this.todos[index]._id);
-      console.log(newTitle);
-       await updateTask(this.todos[index]._id, newTitle);
-       this.todos=await getAllTasks();
+      let newTitle = prompt("Enter new title", this.todos[index].title);
+      if (newTitle) {
+        if (newTitle.length < 5) {
+          alert("title must be at least 5 character");
+          return false;
+        } else {
+          await updateTask(this.todos[index]._id, newTitle);
+          this.todos = await getAllTasks();
+        }
+      }
+      
     },
   },
 
@@ -94,6 +105,7 @@ export default {
   max-width: 550px;
   align-self: center;
 }
+
 #list {
   border-radius: 5px;
   margin-top: 100px;
