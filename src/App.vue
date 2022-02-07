@@ -5,16 +5,20 @@
       <h3 class="header">To Do List</h3>
       <div id="list">
         <ul class="task-list">
-          <li v-for="(todo, index) in todos" :key="todo.title">
-            <div v-if="!todo.done" class="task undone">
+          <li v-for="(todo, index) in todos" :key="todo.title" class="task">
+            <div v-if="!todo.done" class="undone">
+              <p class="title">{{ index }}</p>
               <p class="title">{{ todo.title }}</p>
               <p class="date">{{ new Date(todo.date).toLocaleString() }}</p>
             </div>
             <div v-else class="task done">
+              <p class="title">{{ index }}</p>
               <p class="title">{{ todo.title }}</p>
               <p class="date">{{ new Date(todo.date).toLocaleString() }}</p>
             </div>
-            <button @click="changeStatus(index)">Change Status</button>
+            <button @click="handleChange(index)">Change Status</button>
+            <button @click="deleteItem(index)">Delete Task</button>
+            <button @click="updateItem(index)">Update Task</button>
           </li>
         </ul>
       </div>
@@ -27,7 +31,7 @@
 </template>
 
 <script>
-import { getAllTasks, addTask, changeStatus } from "./api";
+import { getAllTasks, addTask, changeStatus, deleteStatus, updateTask} from "./api";
 export default {
   name: "App",
   data: function () {
@@ -54,14 +58,27 @@ export default {
         alert("Enter task");
       }
     },
-    changeStatus: async function (index) {
+    handleChange: async function (index) {
       await changeStatus(this.todos[index]._id, !this.todos[index].done);
       this.todos = await getAllTasks();
     },
+    deleteItem: async function (index) {
+      await deleteStatus(this.todos[index]._id);
+      this.todos = await getAllTasks();
+    },
+    updateItem: async function (index) {
+      let newTitle = prompt("Enter new title");
+
+      console.log(this.todos[index]._id);
+      console.log(newTitle);
+       await updateTask(this.todos[index]._id, newTitle);
+       this.todos=await getAllTasks();
+    },
   },
+
   created: async function () {
     this.todos = await getAllTasks();
-    console.log(this.todos)
+    console.log(this.todos);
   },
 };
 </script>
@@ -95,8 +112,9 @@ export default {
 }
 .task {
   border: 2px solid #3333;
-  padding: 15px 0;
+  padding: 15px 20px;
   border-radius: 20px;
+  margin: 20px 0;
 }
 .done {
   opacity: 0.5;
