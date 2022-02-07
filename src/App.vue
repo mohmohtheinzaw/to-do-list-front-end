@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { getAllTasks, addTask } from "./api";
+import { getAllTasks, addTask, changeStatus } from "./api";
 export default {
   name: "App",
   data: function () {
@@ -37,16 +37,16 @@ export default {
     };
   },
   methods: {
-    addToList: function () {
+    addToList: async function () {
       if (this.textInput) {
         if (this.textInput.length > 5) {
           let objToAdd = {
             title: this.textInput,
             done: false,
           };
-          addTask(objToAdd);
-          // this.todos.push(objToAdd);
-          // this.textInput = "";
+          await addTask(objToAdd);
+          this.textInput = "";
+          this.todos = await getAllTasks();
         } else {
           alert("name must be at least 5 character");
         }
@@ -54,12 +54,14 @@ export default {
         alert("Enter task");
       }
     },
-    changeStatus: function (index) {
-      this.todos[index].done = !this.todos[index].done;
+    changeStatus: async function (index) {
+      await changeStatus(this.todos[index]._id, !this.todos[index].done);
+      this.todos = await getAllTasks();
     },
   },
   created: async function () {
     this.todos = await getAllTasks();
+    console.log(this.todos)
   },
 };
 </script>

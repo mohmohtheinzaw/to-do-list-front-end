@@ -8,7 +8,6 @@ const getAllTasks = function () {
     fetch("http://localhost:3000/tasks/", options)
       .then((response) => {
         // Checking errors
-        console.log("Response : ", response);
         if (response.status !== 200) {
           reject();
         } else {
@@ -17,7 +16,6 @@ const getAllTasks = function () {
       })
       .then((result) => {
         // Gettng datas
-        console.log("Result : ", result);
         rsolve(result);
       })
       .catch((err) => {
@@ -29,14 +27,16 @@ const getAllTasks = function () {
 
 const addTask = function (task) {
   return new Promise((rsolve, reject) => {
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
     let options = {
       method: "POST",
-      body: task,
+      headers: headers,
+      body: JSON.stringify(task),
     };
-    fetch("http://localhost:3000/tasks", options)
+    fetch("http://localhost:3000/tasks/", options)
       .then((response) => {
         // Checking errors
-        console.log("Response : ", response);
         if (response.status !== 200) {
           reject();
         } else {
@@ -45,7 +45,6 @@ const addTask = function (task) {
       })
       .then((result) => {
         // Gettng datas
-        console.log("Result : ", result);
         rsolve(result);
       })
       .catch((err) => {
@@ -55,4 +54,35 @@ const addTask = function (task) {
   });
 };
 
-export { getAllTasks, addTask };
+const changeStatus = function (taskId, done) {
+  return new Promise((rsolve, reject) => {
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    let options = {
+      method: "PATCH",
+      headers: headers,
+    };
+    fetch(
+      "http://localhost:3000/tasks/change-status/" + taskId + "/" + done,
+      options
+    )
+      .then((response) => {
+        // Checking errors
+        if (response.status !== 200) {
+          reject();
+        } else {
+          return response.json();
+        }
+      })
+      .then((result) => {
+        // Gettng datas
+        rsolve(result);
+      })
+      .catch((err) => {
+        // Request error
+        reject(err);
+      });
+  });
+};
+
+export { getAllTasks, addTask, changeStatus };
